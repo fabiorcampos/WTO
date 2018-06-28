@@ -1,0 +1,63 @@
+---
+title: "WTO_BRAZIL_TICs"
+author: "Fábio Rocha Campos"
+date: "27 de junho de 2018"
+output: html_document
+---
+
+```{r warning=FALSE}
+### libraries
+library(dplyr)
+library(knitr)
+
+### Load Data
+df = read.csv("./dataset/co_e.csv", header = TRUE, sep = ",", dec = ",")
+```
+
+## Config Data
+
+```{r warning=FALSE, results='hide'}
+### Config data
+df = df[,-c(1:5)] # remove columns 
+
+df =  df %>% # group data
+      group_by(Flow_desc,Year) %>%
+      summarise(sm = sum(Value))
+
+import = df[38:74,] 
+export = df[1:37,]
+year = c(1980:2016)
+
+df = data.frame(Years = year, Import = import$sm, Export = export$sm)
+
+format(c(df$Import,df$Export),big.mark=".",scientific=FALSE)
+```
+
+## Insert variables
+
+You can also embed plots, for example:
+
+```{r}
+### Insert Variation % gain
+df = mutate(df, saldo = Export - Import)
+```
+
+## Datatable
+
+```{r}
+kable(df)
+```
+
+## Plot - Balança Comercial
+
+```{r}
+plot = plot(year, df$Import, type = "l", 
+            main = "Balança Comercial - Brazil", 
+            sub = "1980-2016",
+            col = "red",
+            ylab = "Valores em USD",
+            xlab = "Ano")
+lines(year,df$Export)
+```
+
+
